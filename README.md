@@ -6,6 +6,8 @@ Leverage this Serverless Component to deploy a website hosted on serverless infr
 
 &nbsp;
 
+* This version is an experience version and does not guarantee stability.
+
 * [请点击这里查看中文版部署文档](./README_CN.md)
 
 &nbsp;
