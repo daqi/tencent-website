@@ -87,7 +87,7 @@ Hello, Tencent Cloud
 # serverless.yml
 
 myWebsite:
-  component: "@serverless/tencent-website"
+  component: "@tencent-serverless/tencent-website-beta"
   inputs:
     code:
       src: ./code

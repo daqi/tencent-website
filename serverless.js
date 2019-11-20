@@ -157,7 +157,7 @@ class Website extends Component {
     this.context.status(`Preparing Tencent COS Bucket`)
     this.context.debug(`Preparing website Tencent COS bucket ${inputs.bucketName}.`)
 
-    const websiteBucket = await this.load('@serverless/tencent-cos', 'websiteBucket')
+    const websiteBucket = await this.load('@tencent-serverless/tencent-cos-beta', 'websiteBucket')
     await websiteBucket({
       bucket: inputs.bucketName,
       region: inputs.region
@@ -270,7 +270,7 @@ class Website extends Component {
     this.context.debug(`Starting Website Removal.`)
 
     this.context.debug(`Removing Website bucket.`)
-    const websiteBucket = await this.load('@serverless/tencent-cos', 'websiteBucket')
+    const websiteBucket = await this.load('@tencent-serverless/tencent-cos-beta', 'websiteBucket')
     await websiteBucket.remove()
 
     this.state = {}

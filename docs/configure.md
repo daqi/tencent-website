@@ -6,7 +6,7 @@
 # serverless.yml
 
 myWebsite:
-  component: "@serverless/tencent-website"
+  component: "@tencent-serverless/tencent-website-beta"
   inputs:
     code:
       root: ./
