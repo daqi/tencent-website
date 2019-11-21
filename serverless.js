@@ -105,18 +105,21 @@ class Website extends Component {
     })
   }
 
-  async getTempKey() {
+  async getTempKey(temp) {
     const that = this
 
-    try {
-      while ((await fs.readFileSync('./.env_temp', 'utf8', { flag: 'rx' })) == 0) {
-        await that.sleep(1000)
-      }
-    } catch (e) {
-      if (e.toString().match('no such file or directory')) {
-        await fs.writeFileSync('./.env_temp', '0', { flag: 'wx' })
-      } else {
-        while (!(await fs.existsSync('./.env_temp'))) {
+    if (temp) {
+      while (true) {
+        try {
+          const tencent_credentials_read = JSON.parse(await fs.readFileSync('./.env_temp', 'utf8'))
+          if (
+            Date.now() / 1000 - tencent_credentials_read.timestamp <= 5 &&
+            tencent_credentials_read.AppId
+          ) {
+            return tencent_credentials_read
+          }
+          await that.sleep(1000)
+        } catch (e) {
           await that.sleep(1000)
         }
       }
@@ -127,7 +130,10 @@ class Website extends Component {
       try {
         const tencent = {}
         const tencent_credentials_read = JSON.parse(data)
-        if (Date.now() / 1000 - tencent_credentials_read.timestamp <= 6000) {
+        if (
+          Date.now() / 1000 - tencent_credentials_read.timestamp <= 6000 &&
+          tencent_credentials_read.AppId
+        ) {
           return tencent_credentials_read
         }
         const login = new TencentLogin()
@@ -159,13 +165,17 @@ class Website extends Component {
   }
 
   async default(inputs = {}) {
+    // login
+    const temp = this.context.instance.state.status
+    this.context.instance.state.status = true
     this.context.status('Deploying')
     this.context.debug(`Starting Website Component.`)
     let { tencent } = this.context.credentials
     if (!tencent) {
-      tencent = await this.getTempKey()
+      tencent = await this.getTempKey(temp)
       this.context.credentials.tencent = tencent
     }
+
     const option = {
       region: inputs.region || 'ap-guangzhou',
       timestamp: this.context.credentials.tencent.timestamp || null,
