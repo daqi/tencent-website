@@ -1,6 +1,6 @@
 {
   "name": "@tencent-serverless/tencent-website-beta",
-  "version": "1.2.11",
+  "version": "1.2.12",
   "main": "./serverless.js",
   "publishConfig": {
     "access": "public"
