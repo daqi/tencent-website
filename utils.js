@@ -31,7 +31,6 @@ const configureBucketForHosting = async (
     ]
   }
 
-
   const staticHostParams = {
     Bucket: bucketName,
     Region: region,
@@ -41,10 +40,13 @@ const configureBucketForHosting = async (
       },
       ErrorDocument: {
         Key: error || 'error.html'
-      },
-      RedirectAllRequestsTo: {
-        Protocol: protocol || 'https'
       }
+    }
+  }
+
+  if (protocol == 'https') {
+    staticHostParams['WebsiteConfiguration']['RedirectAllRequestsTo'] = {
+      Protocol: 'https'
     }
   }
 

@@ -1,6 +1,6 @@
 {
   "name": "@tencent-serverless/tencent-website-beta",
-  "version": "1.2.12",
+  "version": "1.2.13",
   "main": "./serverless.js",
   "publishConfig": {
     "access": "public"
@@ -17,6 +17,7 @@
   "license": "Apache",
   "dependencies": {
     "@tencent-serverless/tencent-cos-beta": "^1.2.1",
+    "@tencent-serverless/tencent-cdn-beta": "^0.0.1",
     "@serverless/core": "^1.0.0",
     "cos-nodejs-sdk-v5": "^2.5.14",
     "tencentcloud-sdk-nodejs": "^3.0.87",

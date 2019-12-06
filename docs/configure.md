@@ -17,6 +17,35 @@ myWebsite:
     region: ap-guangzhou 
     bucketName: my-bucket
     protocol: http
+    hosts:
+      - host: abc.cn
+      - host: abc.com
+        fullUrl: on
+        cache:
+          - type: 0
+            rule: all
+            time: 1000
+          - type: 0
+            rule: all
+            time: 1000
+        cacheMode: simple
+        refer:
+          - type: 1
+            list:
+              - 'qq.baidu.com'
+              - '*.baidu.com'
+        accessIp:
+          type: 1
+          list:
+            - '1.2.3.4'
+            - '2.3.4.5'
+        https:
+          certId: 123
+          cert: 123
+          privateKey: 123
+          http2: off
+          httpsType: 2
+          forceSwitch: -2
     env: 
       API_URL: https://api.com
     cors:
