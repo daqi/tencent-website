@@ -155,6 +155,9 @@ class Website extends Component {
     } catch (e) {
       throw e
     }
+    console.log('oldVers')
+    console.log(dirToUploadPath, oldVers)
+    console.log('oldVers')
     // 删除旧版本
     if (oldVers.length > oldKeepNum) {
       handler = util.promisify(cos.deleteObject.bind(cos))
