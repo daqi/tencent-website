@@ -140,33 +140,39 @@ class Website extends Component {
     let handler
     // 查询旧版本
     handler = util.promisify(cos.getBucket.bind(cos))
+    let prefix = ''
     let oldVers = []
     const oldKeepNum = 2
-    // appName/release-online.YYYYMMDD-hh:mm/
-    // appName/release-testonly.YYYYMMDD-hh:mm/
-    try {
-      const res = await handler({
-        Bucket: inputs.bucketName,
-        Region: inputs.region,
-        Prefix: dirToUploadPath.slice(0, -15),
-        Delimiter: '/'
-      })
-      oldVers = res.Contents
-    } catch (e) {
-      throw e
+    // appName_release-online.YYYYMMDD-hh:mm/
+    // appName_release-testonly.YYYYMMDD-hh:mm/
+    if (uploadDict.file) {
+      prefix = dirToUploadPath.slice(0, -15)
+    } else {
+      const dir = fs.readdirSync(dirToUploadPath)[0]
+      prefix = dir ? dir.slice(0, -15) : ''
     }
-    console.log('oldVers')
-    console.log(dirToUploadPath, oldVers)
-    console.log('oldVers')
-    // 删除旧版本
-    if (oldVers.length > oldKeepNum) {
-      handler = util.promisify(cos.deleteObject.bind(cos))
-      for (const oldVer of oldVers.slice(0, oldVers.length - oldKeepNum)) {
-        await handler({
+    if (prefix) {
+      try {
+        const res = await handler({
           Bucket: inputs.bucketName,
           Region: inputs.region,
-          Key: oldVer.Key
+          Prefix: prefix,
+          Delimiter: '/'
         })
+        oldVers = res.Contents
+      } catch (e) {
+        throw e
+      }
+      // 删除旧版本
+      if (oldVers.length > oldKeepNum) {
+        handler = util.promisify(cos.deleteObject.bind(cos))
+        for (const oldVer of oldVers.slice(0, oldVers.length - oldKeepNum)) {
+          await handler({
+            Bucket: inputs.bucketName,
+            Region: inputs.region,
+            Key: oldVer.Key
+          })
+        }
       }
     }
 
