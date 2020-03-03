@@ -29,11 +29,11 @@ class Website extends Component {
       action: 'default'
     })
 
-    const option = {
-      region: inputs.region || 'ap-guangzhou',
-      timestamp: this.context.credentials.tencent.timestamp || null,
-      token: this.context.credentials.tencent.token || null
-    }
+    // const option = {
+    //   region: inputs.region || 'ap-guangzhou',
+    //   timestamp: this.context.credentials.tencent.timestamp || null,
+    //   token: this.context.credentials.tencent.token || null
+    // }
 
     // Default to current working directory
     inputs.code = inputs.code || {}
@@ -137,41 +137,42 @@ class Website extends Component {
       uploadDict.file = dirToUploadPath
     }
 
-    let handler
-    // 查询旧版本
-    handler = util.promisify(cos.getBucket.bind(cos))
-    let prefix = ''
-    let oldVers = []
-    const oldKeepNum = 2
-    // appName_release-online.YYYYMMDD-hh:mm/
-    // appName_release-testonly.YYYYMMDD-hh:mm/
-    if (uploadDict.file) {
-      prefix = dirToUploadPath.slice(0, -15)
-    } else {
+    if (uploadDict.dir) {
+      // 控制旧版本数量
+      const keepVersion = inputs.keepVersion || 2
       const dir = fs.readdirSync(dirToUploadPath)[0]
-      prefix = dir ? dir.slice(0, -15) : ''
-    }
-    if (prefix) {
-      try {
-        const res = await handler({
-          Bucket: inputs.bucketName,
-          Region: inputs.region,
-          Prefix: prefix,
-          Delimiter: '/'
-        })
-        oldVers = res.Contents
-      } catch (e) {
-        throw e
-      }
-      // 删除旧版本
-      if (oldVers.length > oldKeepNum) {
-        handler = util.promisify(cos.deleteObject.bind(cos))
-        for (const oldVer of oldVers.slice(0, oldVers.length - oldKeepNum)) {
-          await handler({
+      const match = dir ? dir.match(/(.+?)[\d\-_.|:]+$/) : null
+      const prefix = match ? match[1] : null
+      if (prefix) {
+        let handler
+        let oldVers = []
+        // 查找旧版本
+        try {
+          handler = util.promisify(cos.getBucket.bind(cos))
+          const res = await handler({
             Bucket: inputs.bucketName,
             Region: inputs.region,
-            Key: oldVer.Key
+            Prefix: prefix
           })
+          oldVers = res.Contents
+        } catch (e) {
+          throw e
+        }
+        // 删除旧版本
+        if (oldVers.length > keepVersion) {
+          handler = util.promisify(cos.deleteObject.bind(cos))
+          const arr = oldVers
+            .sort((fst, snd) => {
+              return new Date(fst.LastModified) - new Date(snd.LastModified)
+            })
+            .slice(0, oldVers.length - keepVersion)
+          for (const oldVer of arr) {
+            await handler({
+              Bucket: inputs.bucketName,
+              Region: inputs.region,
+              Key: oldVer.Key
+            })
+          }
         }
       }
     }

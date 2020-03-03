@@ -1,6 +1,6 @@
 {
   "name": "@daqi/tencent-website",
-  "version": "1.2.22",
+  "version": "1.2.27",
   "main": "./serverless.js",
   "publishConfig": {
     "access": "public"
